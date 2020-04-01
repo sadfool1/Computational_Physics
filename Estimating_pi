@@ -1,0 +1,73 @@
+#estimate pi using random dots scattered in -1<x<1 and -1<y<1 graph.
+import numpy as np
+import matplotlib.pyplot as plt
+import time
+
+"""
+pi is approximated at pi = 4(Number of dots in the circle)/10^6
+"""
+
+print ("Computer thinking")
+#we produce 2,000,000 because we want to randomize the plots of 2 axis x and y
+r = np.random.uniform(-1,1,2000000)
+half_length_of_r = len (r)//2 #floor division
+
+x = r[:half_length_of_r]
+y = r[half_length_of_r:]
+
+'''
+check if len of x and y are same
+'''
+
+#print (len(x),len(y))
+
+temp1 = []
+counter = 0 #counter for outside the circle
+counter2 = 0 #counter for inside of the circle
+
+print (".")
+
+for i in range(len(x)):
+    result = np.sqrt((x[i])**2
+                     +(y[i])**2)
+    if result < 1:
+        counter2 = counter2 +1
+        continue #immediately goes to the next loop
+    
+    else:
+        counter = counter + 1
+        temp1.append(i)
+        continue
+'''
+Set this new_array to delete the desired values, 
+this means this is the values within the circle
+'''
+
+new_array1 = np.delete(x, temp1)
+new_array2 = np.delete(y, temp1)
+
+plt.plot(new_array1, new_array2, 'o')
+
+print (".")
+time.sleep(1.5)
+
+print ("The number of points outside the circle is %d."%counter)
+time.sleep(1.5)
+print ("The number of points INSIDE the circle is %d."%counter2)
+time.sleep(1.5)
+
+tally = counter + counter2
+
+if tally == 1000000:
+    print ("The total points are %d"%tally)
+    time.sleep(1)
+    print ("Therefore, the plot tallies")
+    time.sleep(1.5)
+print("Graph is Loading..")
+approx = 4*counter2/10**6
+plt.show()
+
+print ("")
+time.sleep(1.5)
+
+print ("The approximate to pi is %f"%approx)
