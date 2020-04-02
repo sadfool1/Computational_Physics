@@ -1,0 +1,106 @@
+"""
+Objective:
+
+Use Monte Carlo integration method to estimate the proportionality
+constant for a sphere inscribed in the cube {(x, y, z) | −1 ≤ x ≤ 1, −1 ≤ y1, −1 ≤ z1}. Your
+answer should be close to 4/3 * π.
+"""
+
+#estimate pi using random dots scattered in -1<x<1, -1<y<1, -1<z<1 graph.
+import numpy as np
+import matplotlib.pyplot as plt
+import time
+from mpl_toolkits.mplot3d import Axes3D
+import math
+
+print ("Computer thinking")
+
+#we produce 3,000,000 because we want to randomize the plots of 2 axis x and y
+
+r = np.random.uniform(-1,1,3000000)
+
+second_length_of_r = len (r)//3 #floor division
+third_length_of_r = second_length_of_r * 2 #2nd iteration for splicing
+
+#print (second_length_of_r,third_length_of_r)
+
+"""
+===============================================
+Splice and split the random numbers into 
+3 to plot random points within the circle 
+===============================================
+
+"""
+x = r[:second_length_of_r]
+y = r[second_length_of_r:third_length_of_r]
+z = r[third_length_of_r:]
+
+#print (len (x),len (y),len (z))
+temp1 = []
+counter = 0 #counter for outside the circle
+counter2 = 0 #counter for inside of the circle
+
+"""
+===============================================
+Use conditional loop to gather those outside 
+the circle
+
+COUNTER = POINTS OUTSIDE CIRLE
+COUNTER2 = POINTS INSIDE CIRCLE
+===============================================
+
+"""
+time.sleep(0.5)
+print ('.')
+for i in range(len(x)):
+    result = np.sqrt((x[i])**2+(y[i])**2+(z[i]**2))
+    
+    if result < 1:
+        counter2 = counter2 +1
+        continue #immediately goes to the next loop
+    
+    else:
+        counter = counter + 1
+        temp1.append(i)
+        continue
+
+print ('.')
+time.sleep(1)
+print ("There are %d inside the circle and %d outside the cirle"%(counter2,counter))
+time.sleep(1)
+
+new_array1 = np.delete(x, temp1)
+new_array2 = np.delete(y, temp1)
+new_array3 = np.delete(z, temp1)
+
+fig = plt.figure()
+ax = Axes3D(fig)
+ax.set_xlabel("X")
+ax.set_ylabel("Y")
+ax.set_zlabel("Z")
+plt.plot(new_array1, new_array2,new_array3, 'o',  mew=0.07, ms=0.12)
+
+tally = counter+counter2
+if tally == 1000000:
+    print ("There are a total of %d points "%tally)
+    time.sleep(1)
+    print ("Therefore, the simulation tallies")
+    time.sleep(1)
+
+print("Graph is Loading...")
+plt.show()
+
+radius = 1.0
+time.sleep(1)
+Volume_encompassed_by_circle = (8/10**6)*counter2*(radius**3)
+Volume_of_CUBE = radius**3
+proportionality_constant = Volume_encompassed_by_circle/Volume_of_CUBE
+time.sleep(1)
+print ("Correct Answer is close to (4/3)*np.pi Hence we shall compare by % error")
+time.sleep(1)
+EXPECTED_VALUE = (4/3)* np.pi
+
+percentage_error = abs(proportionality_constant-EXPECTED_VALUE)*100
+print ("The percentage error is %f. "%percentage_error)
+
+print("therefore we have a good estimation using the above monte carlo model since % error < 1%)
