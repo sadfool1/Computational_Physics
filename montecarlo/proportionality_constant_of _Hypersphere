@@ -1,0 +1,94 @@
+#estimate pi using random dots scattered in -1<x<1, -1<y<1, -1<z<1, -1<q<1 graph.
+import numpy as np
+import matplotlib.pyplot as plt
+import time
+import math
+
+print ("Computer thinking")
+
+r = np.random.uniform(-1,1,4000000)
+
+second_length_of_r = len (r)//4 #floor division
+third_length_of_r = second_length_of_r * 2 #2nd iteration for splicing
+fourth_length_of_r = second_length_of_r * 3
+
+#print (second_length_of_r,third_length_of_r)
+
+"""
+===============================================
+Splice and split the random numbers into 
+3 to plot random points within the circle 
+===============================================
+
+"""
+x = r[:second_length_of_r]
+y = r[second_length_of_r:third_length_of_r]
+z = r[third_length_of_r:fourth_length_of_r]
+q = r[fourth_length_of_r:]
+
+#print (len (x),len (y),len (z))
+temp1 = []
+counter = 0 #counter for outside the circle
+counter2 = 0 #counter for inside of the circle
+
+"""
+===============================================
+Use conditional loop to gather those outside 
+the circle
+
+COUNTER = POINTS OUTSIDE CIRLE
+COUNTER2 = POINTS INSIDE CIRCLE
+===============================================
+
+"""
+time.sleep(0.5)
+print ('.')
+
+for i in range(len(x)):
+    result = np.sqrt((x[i])**2+(y[i])**2+(z[i]**2)+q[i]**2)
+    
+    if result < 1:
+        counter2 = counter2 +1
+        continue #immediately goes to the next loop
+    
+    else:
+        counter = counter + 1
+        temp1.append(i)
+        continue
+
+
+print ('.')
+time.sleep(0.5)
+
+print ("There are %d inside the circle and %d outside the cirle"%(counter2,counter))
+
+"""
+===============================================
+Update the new array 
+===============================================
+"""
+new_array1 = np.delete(x, temp1)
+new_array2 = np.delete(y, temp1)
+new_array3 = np.delete(z, temp1)
+new_array4 = np.delete(q, temp1)
+
+tally = counter+counter2
+if tally == 1000000:
+    time.sleep(1)
+    print ("There are a total of %d points "%tally)
+    time.sleep(1)
+    print ("Therefore, the simulation tallies.")
+    time.sleep(1)
+
+#print("Graph is Loading...")
+#plt.show()
+
+radius = 1.0
+Volume_encompassed_by_circle = (16/10**6)*counter2*(radius**4) #we use 16 from 2**4
+Volume_of_CUBE = radius**4
+proportionality_constant = Volume_encompassed_by_circle/Volume_of_CUBE
+proportionality_constant_in_terms_pi = proportionality_constant/np.pi
+
+print ("In a HyperSphere, the proportionality constant in terms of pi is %f. "%proportionality_constant_in_terms_pi)
+
+
