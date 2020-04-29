@@ -1,9 +1,4 @@
-"""
-Lorenz attractor (Runge-Kutta method)
-Source Code from https://gist.github.com/komasaru | https://gist.github.com/komasaru/727865adc0bc42ae1e5e90388c2eee3a 
 
-Inspired by: Yuvraj Siddharth retrieved from https://www.academia.edu/33644951/Solution_of_Lorenz_Equations_by_Runge_Kutta_Gill_Method
-"""
 import sys
 import traceback
 import matplotlib.pyplot as plt
