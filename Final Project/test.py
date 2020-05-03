@@ -20,10 +20,12 @@ class window():
         self.master.graphframe = LabelFrame(master = self.master, text = "Phase Space")
         self.master.graphframe.grid()
         
-        self.master.label = Label(self.master.graphframe, text="Graph", height = 3, width = 15).grid(row=0, column=0, columnspan=10)
+        self.master.label1 = Label(self.master.graphframe, text="Graph", height = 3, width = 15).grid(row=5, column=0, columnspan=10)
         
-        self.slider = Scale(self.master, text = "r val" , from_=0, to=42, orient=HORIZONTAL)
-        self.slider.grid(row = 5,column = 5)
+        self.slider = Scale(self.master, from_=0, to=42, orient=HORIZONTAL)
+        self.slider.grid(row = 0, column = 0)
+        
+        self.master.label2 = Label(self.master, text="r value", height = 1, width = 12).grid(row=10, column=10, columnspan=1)
         
         self.master.mainloop()
         
