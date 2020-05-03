@@ -4,8 +4,29 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from random import randint
 import math
-#from Tkinter import *
+from tkinter import *
 
+
+class window():
+    
+    def __init__(self):
+        self.master = Tk()
+        self.master.grid()
+        
+        self.master.title("Lorenz Simulation")
+        self.master.geometry = ("500x500")
+        self.master.resizable = (False, False)
+
+        self.master.graphframe = LabelFrame(master = self.master, text = "Phase Space")
+        self.master.graphframe.grid()
+        
+        self.master.label = Label(self.master.graphframe, text="Graph", height = 3, width = 15).grid(row=0, column=0, columnspan=10)
+        
+        self.slider = Scale(self.master, text = "r val" , from_=0, to=42, orient=HORIZONTAL)
+        self.slider.grid(row = 5,column = 5)
+        
+        self.master.mainloop()
+        
 
 class LorenzAttractorRungeKutta:
     DT            = 1e-3     # Differential interval
@@ -86,20 +107,11 @@ class LorenzAttractorRungeKutta:
 if __name__ == '__main__':
     try:
         obj = window()
-        obj.exec()
+        #obj.exec()
     except Exception as e:
         traceback.print_exc()
         sys.exit(1)
 
-class window():
-    
-    def __init__(self):
-        self.master = Tk()
-        self.title("Lorenz Simulation")
-        self.resizable = (False, False)
-        self.geometry = ("500x500")
-        
-        self.slider = Scale(master, from_=0, to=42)
-        self.slider.pack()
+
         
     
