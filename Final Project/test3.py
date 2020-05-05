@@ -8,7 +8,7 @@ Created on Tue May  5 18:02:55 2020
 
 import matplotlib
 matplotlib.use("TkAgg")
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 
 import tkinter as tk
@@ -121,7 +121,7 @@ class PageThree(tk.Frame):
         
 
         canvas = FigureCanvasTkAgg(f, self)
-        canvas.show()
+        canvas.draw()
         canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
 
         toolbar = NavigationToolbar2TkAgg(canvas, self)

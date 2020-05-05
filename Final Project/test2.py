@@ -23,29 +23,29 @@ class window():
         global sigma_entry
         global b_entry
         
-        self.master = Tk()
-        self.master.grid()
+        self.root = Tk()
+        self.root.grid()
         
-        self.master.title("Lorenz Simulation")
-        self.master.geometry = ("500x500")
-        self.master.resizable = (False, False)
+        self.root.title("Lorenz Simulation")
+        self.root.geometry = ("500x500")
+        self.root.resizable = (False, False)
         self.res = [[], [], []]
 
-        self.master.graphframe = LabelFrame(master = self.master, text = "Phase Space")
-        self.master.label1 = Label(self.master.graphframe, text="Graph", height = 3, width = 15).grid(row=5, column=0, columnspan=10)
+        self.root.graphframe = LabelFrame(master = self.root, text = "Phase Space")
+        self.root.label1 = Label(self.root.graphframe, text="Graph", height = 3, width = 15).grid(row=5, column=0, columnspan=10)
         
         r_entry = Entry(self.master).grid(row = 1, column = 0)
-        self.master.r_label = Label(self.master, text="r value", height = 1, width = 12).grid(row=2, column=0, columnspan=1)
+        self.root.r_label = Label(self.root, text="r value", height = 1, width = 12).grid(row=2, column=0, columnspan=1)
                 
         sigma_entry = Entry(self.master).grid(row = 1, column = 1)
-        self.master.sigma_label = Label(self.master, text="sigma value", height = 1, width = 12).grid(row=2, column=1, columnspan=1)
+        self.root.sigma_label = Label(self.root, text="sigma value", height = 1, width = 12).grid(row=2, column=1, columnspan=1)
         
         b_entry = Entry(self.master).grid(row = 1, column = 2)
-        self.master.b_label = Label(self.master, text="b value", height = 1, width = 12).grid(row=2, column=2, columnspan=1)
+        self.root.b_label = Label(self.root, text="b value", height = 1, width = 12).grid(row=2, column=2, columnspan=1)
         
-        self.plot_button = Button (self.master, command = self.exec, height = 4, width = 2).grid(row = 3, column = 1)
+        self.plot_button = Button (self.root, command = self.exec, height = 4, width = 2).grid(row = 3, column = 1)
         
-        self.master.mainloop()
+        self.root.mainloop()
 
     def exec(self):
         """ Loranz attractor (Runge-Kutta method) execution """

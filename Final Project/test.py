@@ -5,6 +5,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from random import randint
 import math
 from tkinter import *
+import tkinter as tk
 import matplotlib
 
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -40,7 +41,7 @@ class window():
 class LorenzAttractorRungeKutta(tk.Frame):
     DT            = 1e-3     # Differential interval
     STEP          = 100000   # Time step count
-    X_0, Y_0, Z_0 = 0,0,0
+    
     #print (X_0, Y_0, Z_0) #Show randomised initial conditions
 
     
@@ -49,34 +50,46 @@ class LorenzAttractorRungeKutta(tk.Frame):
         global sigma_entry
         global b_entry
         
-        self.master = Tk()
-        self.master.grid()
+        super(LorenzAttractorRungeKutta, self).__init__()
+        #self.widgets={}
+        #self.grid(column=0,row=0)
         
-        self.master.title("Lorenz Simulation")
-        self.master.geometry = ("500x500")
-        self.master.resizable = (False, False)
+        self.X_0, self.Y_0, self.Z_0 = 0,0,0
+        
+        self.root = Tk()
+        self.root.grid()
+        self.root.title("Lorenz Simulation")
+        self.root.geometry = ("500x500")
+        self.root.resizable = (False, False)
+        
         self.res = [[], [], []]
 
-        self.master.graphframe = LabelFrame(master = self.master, text = "Phase Space")
-        self.master.label1 = Label(self.master.graphframe, text="Graph", height = 3, width = 15).grid(row=5, column=0, columnspan=10)
+        self.root.graphframe = LabelFrame(master = self.root, text = "Phase Space")
+        self.root.label1 = Label(self.root.graphframe, text="Graph", height = 3, width = 15).grid(row=5, column=0, columnspan=10)
         
-        r_entry = Entry(self.master).grid(row = 1, column = 0)
-        self.master.r_label = Label(self.master, text="r value", height = 1, width = 12).grid(row=2, column=0, columnspan=1)
+        #self.root.graphframe = LabelFrame(master = self.root, text = "Phase Space")
+        #self.root.label1 = Label(self.root.graphframe, text="Graph", height = 3, width = 15).grid(row=5, column=0, columnspan=10)
+        
+        r_entry = Entry(self.root).grid(row = 1, column = 0)
+        self.root.r_label = Label(self.root, text="r value", height = 1, width = 12).grid(row=2, column=0, columnspan=1)
                 
-        sigma_entry = Entry(self.master).grid(row = 1, column = 1)
-        self.master.sigma_label = Label(self.master, text="sigma value", height = 1, width = 12).grid(row=2, column=1, columnspan=1)
+        sigma_entry = Entry(self.root).grid(row = 1, column = 1)
+        self.root.sigma_label = Label(self.root, text="sigma value", height = 1, width = 12).grid(row=2, column=1, columnspan=1)
         
-        b_entry = Entry(self.master).grid(row = 1, column = 2)
-        self.master.b_label = Label(self.master, text="b value", height = 1, width = 12).grid(row=2, column=2, columnspan=1)
+        b_entry = Entry(self.root).grid(row = 1, column = 2)
+        self.root.b_label = Label(self.root, text="b value", height = 1, width = 12).grid(row=2, column=2, columnspan=1)
         
-        self.plot_button = Button (self.master, command = self.exec(), height = 4, width = 2).grid(row = 3, column = 1)
+        self.plot_button = Button (self.root, command = self.plot, height = 4, width = 2).grid(row = 3, column = 1)
         
-        self.master.mainloop()
+        self.root.mainloop()
 
-    def exec(self):
-        """ Loranz attractor (Runge-Kutta method) execution """
+    def plot(self):
+        
+        tk.Frame.__init__(self, self.root)
+        
         try:
             xyz = [self.X_0, self.Y_0, self.Z_0]
+            print (xyz)
             for _ in range(self.STEP):
                 k_0 = self.__lorenz(xyz)
                 k_1 = self.__lorenz([x + k * self.DT / 2 for x, k in zip(xyz, k_0)])
@@ -87,27 +100,32 @@ class LorenzAttractorRungeKutta(tk.Frame):
                             * self.DT / 6.0
                     self.res[i].append(xyz[i])
                     
-            f = Figure(figsize=(5,5), dpi=100)
+            print (self.res[1])
+            
+            f = Figure(figsize=(10,10), dpi=100)
             a = f.add_subplot(111)
             a.plot(self.res[0], self.res[1])
     
     
             canvas = FigureCanvasTkAgg(f, self)
-            canvas.show()
-            canvas.get_tk_widget().grid(master = self.master.graphframe, row = 0, column = 0)
+            canvas.draw()
+            canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         except Exception as e:
             raise
 
-    def __lorenz(self, xyz, p=10, r=24.4+math.sin((0.01)*DT)
+    def __lorenz(self, xyz, p=10, r=24.4
                  , b=8/3.0):
-        """ Lorenz equation
-        :param  list xyz
-        :param  float  p
-        :param  float  r
-        :param  float  b
-        :return list xyz
-        """
+        global r_entry
+        global sigma_entry
+        global b_entry
+        
+        
+        print (sigma_entry,r_entry,b_entry)
+        p = sigma_entry
+        r = r_entry
+        b = b_entry
+
         try:
             return [
                 -p * xyz[0] + p * xyz[1],
