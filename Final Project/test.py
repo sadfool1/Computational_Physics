@@ -14,7 +14,7 @@ from matplotlib import style
 
 matplotlib.use("TkAgg")
 
-class LorenzAttractorRungeKutta(tk.Frame):
+class LorenzAttractorRungeKutta():
     DT            = 1e-3     # Differential interval
     STEP          = 100000   # Time step count
     
@@ -25,7 +25,7 @@ class LorenzAttractorRungeKutta(tk.Frame):
         global user_sigma_entry
         global user_b_entry
         
-        super(LorenzAttractorRungeKutta, self).__init__()
+        #super(LorenzAttractorRungeKutta, self).__init__()
         
         self.X_0, self.Y_0, self.Z_0 = 0,0,0
         
@@ -43,21 +43,21 @@ class LorenzAttractorRungeKutta(tk.Frame):
         
         #self.root.graphframe = LabelFrame(master = self.root, text = "Phase Space")
         #self.root.label1 = Label(self.root.graphframe, text="Graph", height = 3, width = 15).grid(row=5, column=0, columnspan=10)
-        user_r_entry = IntVar()
+        user_r_entry = DoubleVar()
         r_entry = Entry(self.root, textvariable = user_r_entry).grid(row = 1, column = 0)
         self.root.r_label = Label(self.root, text="r value", height = 1, width = 12).grid(row=2, column=0, columnspan=1)
                 
-        user_sigma_entry = IntVar()
+        user_sigma_entry = DoubleVar()
         sigma_entry = Entry(self.root, textvariable = user_sigma_entry).grid(row = 1, column = 1)
         self.root.sigma_label = Label(self.root, text="sigma value", height = 1, width = 12).grid(row=2, column=1, columnspan=1)
         
-        user_b_entry = IntVar()
+        user_b_entry = DoubleVar()
         b_entry = Entry(self.root, textvariable = user_b_entry).grid(row = 1, column = 2)
         self.root.b_label = Label(self.root, text="b value", height = 1, width = 12).grid(row=2, column=2, columnspan=1)
         
         self.plot_button = Button (self.root, command = self.click1, height = 2, width = 8, text = "Run").grid(row = 3, column = 1)
         
-        self.mainloop()
+        self.root.mainloop()
         
         
     def click1(self):
@@ -69,17 +69,7 @@ class LorenzAttractorRungeKutta(tk.Frame):
         sigma_info = user_sigma_entry.get()
         b_info = user_b_entry.get()
         
-        print (r_info, sigma_info, b_info)
-        
     def plot(self):
-        global user_r_entry
-        global user_sigma_entry
-        global user_b_entry
-        global r_info
-        global sigma_info
-        global b_info
-        
-        print (r_info,sigma_info,b_info)
         
         tk.Frame.__init__(self, self.root)
         
