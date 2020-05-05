@@ -48,15 +48,10 @@ class LorenzAttractorRungeKutta:
         except Exception as e:
             raise
 
-    def __lorenz(self, xyz, p=10, r=24.4+math.sin((0.01)*DT)
-                 , b=8/3.0):
-        """ Lorenz equation
-        :param  list xyz
-        :param  float  p
-        :param  float  r
-        :param  float  b
-        :return list xyz
-        """
+    def __lorenz(self, xyz):
+        p=10 
+        r=24.4+math.sin((0.01)*self.DT)
+        b=8/3.0
         try:
             return [
                 -p * xyz[0] + p * xyz[1],
@@ -89,7 +84,6 @@ if __name__ == '__main__':
     try:
         obj = LorenzAttractorRungeKutta()
         obj.exec()
-        print (LorenzAttractorRungeKutta.self.res[1])
         
     except Exception as e:
         traceback.print_exc()

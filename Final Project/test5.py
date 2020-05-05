@@ -16,9 +16,8 @@ matplotlib.use("TkAgg")
 
 class LorenzAttractorRungeKutta(tk.Frame):
     DT            = 1e-3     # Differential interval
-    STEP          = 100000   # Time step count
-    
-
+    STEP          = 100   # Time step count
+    X_0, Y_0, Z_0 = 0,0,0
     
     def __init__(self,*args, **kwargs):
         
@@ -28,12 +27,6 @@ class LorenzAttractorRungeKutta(tk.Frame):
         global user_r_entry
         global user_sigma_entry
         global user_b_entry
-        
-        #super(LorenzAttractorRungeKutta, self).__init__()
-        
-        self.X_0 = 0
-        self.Y_0 = 0
-        self.Z_0 = 0
         
         self.root = Tk()
         self.root.grid()
@@ -78,34 +71,30 @@ class LorenzAttractorRungeKutta(tk.Frame):
         sigma_info = user_sigma_entry.get()
         b_info = user_b_entry.get()
         
-        print (r_info,sigma_info,b_info)
-        
         tk.Frame.__init__(self, self.root)
-        print (self.STEP)
-        try:
-            xyz = [self.X_0, self.Y_0, self.Z_0]
-            for _ in range(self.STEP):
-                k_0 = self.__lorenz(xyz)
-                k_1 = self.__lorenz([x + k * self.DT / 2 for x, k in zip(xyz, k_0)])
-                k_2 = self.__lorenz([x + k * self.DT / 2 for x, k in zip(xyz, k_1)])
-                k_3 = self.__lorenz([x + k * self.DT for x, k in zip(xyz, k_2)])
-                for i in range(3):
-                    xyz[i] += (k_0[i] + 2 * k_1[i] + 2 * k_2[i] + k_3[i]) \
-                            * self.DT / 6.0
-                    self.res[i].append(xyz[i])
-            
-            
-            f = Figure(figsize=(10,10), dpi=100)
-            a = f.add_subplot(111)
-            a.plot(self.res[0], self.res[1])
-    
-    
-            canvas = FigureCanvasTkAgg(f, self)
-            canvas.draw()
-            canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        
+        print (r_info, sigma_info, b_info)
+        
+        #try:
+        xyz = [self.X_0, self.Y_0, self.Z_0]
+        print (xyz)
+        
+        for _ in range(self.STEP):
+            k_0 = self.__lorenz(xyz)
+            k_1 = self.__lorenz([x + k * self.DT / 2 for x, k in zip(xyz, k_0)])
+            k_2 = self.__lorenz([x + k * self.DT / 2 for x, k in zip(xyz, k_1)])
+            k_3 = self.__lorenz([x + k * self.DT for x, k in zip(xyz, k_2)])
+            for i in range(3):
+                xyz[i] += (k_0[i] + 2 * k_1[i] + 2 * k_2[i] + k_3[i]) \
+                        * self.DT / 6.0
+                self.res[i].append(xyz[i])
+        
+        
+        print (self.res[1])
+        plt.plot(self.res[0], self.res[1])
 
-        except Exception as e:
-            raise
+        #except Exception as e:
+        #    raise
             
 
     def __lorenz(self, xyz):
@@ -116,21 +105,19 @@ class LorenzAttractorRungeKutta(tk.Frame):
         p = sigma_info
         r = r_info
         b = b_info
-
-        try:
-            return [
-                -p * xyz[0] + p * xyz[1],
+        
+        print ([-p * xyz[0] + p * xyz[1], 
                 -xyz[0] * xyz[2] + r * xyz[0] - xyz[1],
-                xyz[0] * xyz[1] - b * xyz[2]
-            ]
-        except Exception as e:
-            raise
+                xyz[0] * xyz[1] - b * xyz[2]])
+
+        #try:
+        return [-p * xyz[0] + p * xyz[1], -xyz[0] * xyz[2] + r * xyz[0] - xyz[1], xyz[0] * xyz[1] - b * xyz[2]]
+        #except Exception as e:
+        #    raise
+            
     def Quit(self):
         self.root.destroy()
-        
 
-
-        
 
 if __name__ == '__main__':
     try:
