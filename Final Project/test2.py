@@ -32,7 +32,6 @@ class window():
         self.res = [[], [], []]
 
         self.master.graphframe = LabelFrame(master = self.master, text = "Phase Space")
-        
         self.master.label1 = Label(self.master.graphframe, text="Graph", height = 3, width = 15).grid(row=5, column=0, columnspan=10)
         
         r_entry = Entry(self.master).grid(row = 1, column = 0)
@@ -44,24 +43,10 @@ class window():
         b_entry = Entry(self.master).grid(row = 1, column = 2)
         self.master.b_label = Label(self.master, text="b value", height = 1, width = 12).grid(row=2, column=2, columnspan=1)
         
-        self.plot_button = Button (self.master, command = plotter, height = 4, width = 2, state=DISABLED).grid(row = 3, column = 1)
+        self.plot_button = Button (self.master, command = self.exec, height = 4, width = 2).grid(row = 3, column = 1)
         
         self.master.mainloop()
 
-    def plotter(self, event = None):
-        f = Figure(figsize=(5,5), dpi=100)
-        a = f.add_subplot(111)
-        a.plot(self.res[0], self.res[1])
-
-
-        canvas = FigureCanvasTkAgg(f, self)
-        canvas.show()
-        canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
-
-        toolbar = NavigationToolbar2TkAgg(canvas, self)
-        toolbar.update()
-        canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-        
     def exec(self):
         """ Loranz attractor (Runge-Kutta method) execution """
         try:
@@ -75,22 +60,31 @@ class window():
                     xyz[i] += (k_0[i] + 2 * k_1[i] + 2 * k_2[i] + k_3[i]) \
                             * self.DT / 6.0
                     self.res[i].append(xyz[i])
-            #plt.axes()
-            #plt.xlim([0, 50])
-            #plt.ylim([-20, 20])
-            plt.xlabel("t")
-            plt.ylabel("Z(t)")
-            plt.title('Z(t) vs t')
+
             
             dimentioner_res_0 = [i for i in range(len(self.res[1]))]
             plt.plot(dimentioner_res_0, self.res[1]) #draw Z-t, X-t, Y-t to analyse if stable manifold etc.
             #plt.plot(self.res[2], self.res[0]) #self.res[0] is values corresponding to x, [1] to y, [2] to z
             
             self.__plot() #calls out function to plot in 3D
+            
+            f = Figure(figsize=(5,5), dpi=100)
+            a = f.add_subplot(111)
+            a.plot(self.res[0], self.res[1])
+    
+    
+            canvas = FigureCanvasTkAgg(f, self)
+            canvas.show()
+            canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+    
+            toolbar = NavigationToolbar2TkAgg(canvas, self)
+            toolbar.update()
+            canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
             
         except Exception as e:
             raise
+
 
     def __lorenz(self, xyz):
         global r_entry
@@ -100,6 +94,7 @@ class window():
         p= sigma_entry 
         r= r_entry 
         b= b_entry
+        
         try:
             return [
                 -p * xyz[0] + p * xyz[1],
