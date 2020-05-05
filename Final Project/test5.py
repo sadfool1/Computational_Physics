@@ -20,14 +20,20 @@ class LorenzAttractorRungeKutta(tk.Frame):
     
 
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self,*args, **kwargs):
+        
+        global user_r_entry
+        global user_sigma_entry
+        global user_b_entry
         global user_r_entry
         global user_sigma_entry
         global user_b_entry
         
-        super(LorenzAttractorRungeKutta, self).__init__()
+        #super(LorenzAttractorRungeKutta, self).__init__()
         
-        self.X_0, self.Y_0, self.Z_0 = 0,0,0
+        self.X_0 = 0
+        self.Y_0 = 0
+        self.Z_0 = 0
         
         self.root = Tk()
         self.root.grid()
@@ -55,16 +61,18 @@ class LorenzAttractorRungeKutta(tk.Frame):
         b_entry = Entry(self.root, textvariable = user_b_entry).grid(row = 1, column = 2)
         self.root.b_label = Label(self.root, text="b value", height = 1, width = 12).grid(row=2, column=2, columnspan=1)
         
-        self.plot_button = Button (self.root, command = self.click1, height = 2, width = 8, text = "Run").grid(row = 3, column = 1)
-        
+        self.plot_button1 = Button (self.root, command = self.click1, height = 2, width = 8, text = "Run").grid(row = 3, column = 1)
+        self.plot_button2 = Button (self.root, command = self.root.destroy, height = 2, width = 8, text = "Quit").grid(row = 4, column = 1)
         self.root.mainloop()
         
         
     def click1(self):
-        
         global r_info
         global sigma_info
         global b_info
+        global user_r_entry
+        global user_sigma_entry
+        global user_b_entry
         
         r_info = user_r_entry.get()
         sigma_info = user_sigma_entry.get()
@@ -72,6 +80,8 @@ class LorenzAttractorRungeKutta(tk.Frame):
         
         print (r_info,sigma_info,b_info)
         
+        tk.Frame.__init__(self, self.root)
+        print (self.STEP)
         try:
             xyz = [self.X_0, self.Y_0, self.Z_0]
             for _ in range(self.STEP):
@@ -83,8 +93,7 @@ class LorenzAttractorRungeKutta(tk.Frame):
                     xyz[i] += (k_0[i] + 2 * k_1[i] + 2 * k_2[i] + k_3[i]) \
                             * self.DT / 6.0
                     self.res[i].append(xyz[i])
-                    
-            #print (self.res[1])
+            
             
             f = Figure(figsize=(10,10), dpi=100)
             a = f.add_subplot(111)
@@ -94,11 +103,10 @@ class LorenzAttractorRungeKutta(tk.Frame):
             canvas = FigureCanvasTkAgg(f, self)
             canvas.draw()
             canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-            
-            print (self.res[1])
 
         except Exception as e:
             raise
+            
 
     def __lorenz(self, xyz):
         global r_info
@@ -117,10 +125,11 @@ class LorenzAttractorRungeKutta(tk.Frame):
             ]
         except Exception as e:
             raise
-            
-    def destroy(self, Event = None):
-        sys.exit(1)
+    def Quit(self):
+        self.root.destroy()
         
+
+
         
 
 if __name__ == '__main__':
