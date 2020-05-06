@@ -75,17 +75,20 @@ class LorenzAttractorRungeKutta():
             self.res = [[], [], []] #initialise list to keep the values
             
             controlframe = LabelFrame(self.root, text = "Parameter Control")
-            controlframe.grid(row = 1, column = 0) #this creates a frame for the entry
+            controlframe.grid(row = 1, column = 0) #this creates a frame for the entries
             
-            user_r_entry = DoubleVar() 
+             #DoubleVar allows the user to enter float values
+            user_r_entry = DoubleVar()
             r_entry = Entry(controlframe, textvariable = user_r_entry).grid(row = 1, column = 0)
             self.root.r_label = Label(controlframe, text="r value", height = 1, width = 12).grid(row=2, column=0, columnspan=1)
-                    
-            user_sigma_entry = DoubleVar()
+            
+            #DoubleVar allows the user to enter float values
+            user_sigma_entry = DoubleVar() 
             sigma_entry = Entry(controlframe, textvariable = user_sigma_entry).grid(row = 1, column = 1)
             self.root.sigma_label = Label(controlframe, text="sigma value", height = 1, width = 12).grid(row=2, column=1, columnspan=1)
             
-            user_b_entry = DoubleVar()
+             #DoubleVar allows the user to enter float values
+            user_b_entry = DoubleVar() 
             b_entry = Entry(controlframe, textvariable = user_b_entry).grid(row = 1, column = 2)
             self.root.b_label = Label(controlframe, text="b value", height = 1, width = 12).grid(row=2, column=2, columnspan=1)
             """
@@ -113,13 +116,14 @@ class LorenzAttractorRungeKutta():
             
             graphframe = LabelFrame (self.root, text = "Graph") #creates a graph frame
             graphframe.grid(row = 0, column = 0)
-            fig = Figure()
+            
+            fig = Figure() #initialiase this into a Figure to be placed in canvas below
             self.canvas = FigureCanvasTkAgg(fig, master = graphframe)
             
             self.root.mainloop()
             
         except tk.TclError:
-            print (messagebox.showinfo("Invalid!", "Please make sure to enter valid inputs (i.e. integers or floats"))
+            print (messagebox.showinfo("INVALID", "Please make sure to enter valid inputs (i.e. integers or floats"))
             
         
         
@@ -148,7 +152,8 @@ class LorenzAttractorRungeKutta():
             
             print ("")
             print ("==============================================")
-            print ("                SYSTEM REPORT")                   
+            print ("                 SYSTEM REPORT                ")              
+            
             timeinit = time.process_time() #start timer to get execution time
                         
             print ("User entered: \n r     = %f \n sigma = %f \n b     = %f \n" 
@@ -174,17 +179,17 @@ class LorenzAttractorRungeKutta():
             ax.set_xlabel("x")
             ax.set_ylabel("y")
             ax.set_zlabel("z")
-            self.canvas = FigureCanvasTkAgg(fig, master = graphframe)
             
+            self.canvas = FigureCanvasTkAgg(fig, master = graphframe) #This embeds the graph into Tkinter, places this with its master in graphframe
             ax.plot(self.res[0], self.res[1], self.res[2], color="red", lw=1) 
     
             self.canvas.draw() #main app that draws and embeds the graph onto tkinter app
             self.canvas.get_tk_widget().grid(row = 0, column = 0) #.grid places the object on the window.
             
             timeend = time.process_time()
-            timer =  timeend - timeinit
+            timer =  timeend - timeinit #this obtians the time taken to excecute
             print ("Time taken to execute: %f seconds " % timer)
-            print ("                 END OF REPORT")
+            print ("                 END OF REPORT                ")
             print ("==============================================")
 
 
@@ -194,7 +199,6 @@ class LorenzAttractorRungeKutta():
             
     
     def clear(self): #FigureCanvasTkAgg has no module to delete canvas, hence i am forcing close and reopen of the app
-
         self.root.destroy() #destroy main app 
         LorenzAttractorRungeKutta() #reset new one
         
