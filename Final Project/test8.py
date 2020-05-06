@@ -29,7 +29,7 @@ matplotlib.use("TkAgg") #Backend of Matplotlib and we pull out TkAgg
 
 
 
-class LorenzAttractorRungeKutta(tk.Frame):
+class LorenzAttractorRungeKutta():
     DT            = 1e-3     # Differential interval
     STEP          = 100000   # Time step count
     X_0, Y_0, Z_0 = random.random(),random.random(),random.random()
@@ -51,6 +51,8 @@ class LorenzAttractorRungeKutta(tk.Frame):
         global user_r_entry
         global user_sigma_entry
         global user_b_entry
+        global graphframe
+        global root
         
         """
         =====================
@@ -69,30 +71,42 @@ class LorenzAttractorRungeKutta(tk.Frame):
         
         self.res = [[], [], []]
         
+        controlframe = LabelFrame(self.root, text = "Parameter Control")
+        controlframe.grid(row = 1, column = 0)
+        
         user_r_entry = DoubleVar()
-        r_entry = Entry(self.root, textvariable = user_r_entry).grid(row = 1, column = 0)
-        self.root.r_label = Label(self.root, text="r value", height = 1, width = 12).grid(row=2, column=0, columnspan=1)
+        r_entry = Entry(controlframe, textvariable = user_r_entry).grid(row = 1, column = 0)
+        self.root.r_label = Label(controlframe, text="r value", height = 1, width = 12).grid(row=2, column=0, columnspan=1)
                 
         user_sigma_entry = DoubleVar()
-        sigma_entry = Entry(self.root, textvariable = user_sigma_entry).grid(row = 1, column = 1)
-        self.root.sigma_label = Label(self.root, text="sigma value", height = 1, width = 12).grid(row=2, column=1, columnspan=1)
+        sigma_entry = Entry(controlframe, textvariable = user_sigma_entry).grid(row = 1, column = 1)
+        self.root.sigma_label = Label(controlframe, text="sigma value", height = 1, width = 12).grid(row=2, column=1, columnspan=1)
         
         user_b_entry = DoubleVar()
-        b_entry = Entry(self.root, textvariable = user_b_entry).grid(row = 1, column = 2)
-        self.root.b_label = Label(self.root, text="b value", height = 1, width = 12).grid(row=2, column=2, columnspan=1)
+        b_entry = Entry(controlframe, textvariable = user_b_entry).grid(row = 1, column = 2)
+        self.root.b_label = Label(controlframe, text="b value", height = 1, width = 12).grid(row=2, column=2, columnspan=1)
         
         self.plot_button1 = Button (self.root, 
                                     command = self.click1, 
                                     height = 2, 
                                     width = 8, 
-                                    text = "Run").grid(row = 3, column = 1)
+                                    text = "Run").grid(row = 2, column = 0)
         
         self.plot_button2 = Button (self.root, 
                                     command = self.Quit, 
                                     height = 2, 
                                     width = 8, 
-                                    text = "Quit").grid(row = 4, column = 1)
+                                    text = "Quit").grid(row = 4, column = 0)
+        self.plot_button3 = Button (self.root, 
+                            command = self.clear, 
+                            height = 2, 
+                            width = 8, 
+                            text = "Clear").grid(row = 3, column = 0)
         
+        graphframe = LabelFrame (self.root, text = "Graph")
+        graphframe.grid(row = 0, column = 0)
+        fig = Figure()
+        self.canvas = FigureCanvasTkAgg(fig, master = graphframe)
         
         self.root.mainloop()
         
@@ -114,17 +128,19 @@ class LorenzAttractorRungeKutta(tk.Frame):
         global user_r_entry
         global user_sigma_entry
         global user_b_entry
-        
-        
-        canvas.delete("all")
-        
+        global newFrame
+        global graphframe
+
         try:
+            #fig = Figure() #Produces a 3D graph
+            #self.canvas = FigureCanvasTkAgg(fig, master = self.graphframe) #this embeds the graph into the graphical UI
+                       
             timeinit = time.process_time()
             r_info = user_r_entry.get() #This obtains the user input for r
             sigma_info = user_sigma_entry.get() #This obtains the user input for sigma
             b_info = user_b_entry.get()  #This obtains the user input for b
             
-            tk.Frame.__init__(self, master = self.root) # this initialises the frame we used earlier
+            #tk.Frame.__init__(self, master = self.root) # this initialises the frame we used earlier
             
             print ("User entered r = %f, sigma = %f and b = %f." % (r_info, sigma_info, b_info))
             print ("The randomised initial values are \\ X0 = %f \\ Y0 = %f \\ Z0 = %f." %(self.X_0, self.Y_0, self.Z_0))
@@ -141,28 +157,32 @@ class LorenzAttractorRungeKutta(tk.Frame):
                             * self.DT / 6.0
                     self.res[i].append(xyz[i])
                     
-                    
-            fig = Figure() #Produces a 3D graph
+            fig = Figure() 
             ax = Axes3D(fig)
             ax.set_xlabel("x")
             ax.set_ylabel("y")
             ax.set_zlabel("z")
+            self.canvas = FigureCanvasTkAgg(fig, master = graphframe)
             
             ax.plot(self.res[0], self.res[1], self.res[2], color="red", lw=1) 
     
-            canvas = FigureCanvasTkAgg(fig, master = self.root) #this embeds the graph into the graphical UI 
-            canvas.draw()
-            canvas.get_tk_widget().grid(row = 0, column = 1)
+            self.canvas.draw()
+            self.canvas.get_tk_widget().grid(row = 0, column = 0)
             
             timeend = time.process_time()
             timer =  timeend - timeinit
             print ("Running time: %f. seconds " % timer)
 
 
-        except Exception as e:
+        except Exception:
             raise
             
+    
+    def clear(self): #FigureCanvasTkAgg has no module to delete canvas, hence i am forcing close and reopen of the app
 
+        self.root.destroy()
+        LorenzAttractorRungeKutta()
+        
     def __lorenz(self, xyz):
         global r_info
         global sigma_info
