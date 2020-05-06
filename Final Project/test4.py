@@ -10,7 +10,7 @@ import math
 class LorenzAttractorRungeKutta:
     DT            = 1e-3     # Differential interval
     STEP          = 100000   # Time step count
-    X_0, Y_0, Z_0 = randint(2,12), randint(2,12), randint(2,12)  # Initial values of x, y, z
+    X_0, Y_0, Z_0 = 1,1,1  # Initial values of x, y, z
     print (X_0, Y_0, Z_0) #Show randomised initial conditions
 
 
@@ -31,16 +31,16 @@ class LorenzAttractorRungeKutta:
                     xyz[i] += (k_0[i] + 2 * k_1[i] + 2 * k_2[i] + k_3[i]) \
                             * self.DT / 6.0
                     self.res[i].append(xyz[i])
-            #plt.axes()
-            #plt.xlim([0, 50])
-            #plt.ylim([-20, 20])
+
             plt.xlabel("t")
             plt.ylabel("Z(t)")
             plt.title('Z(t) vs t')
             
+            print (self.res[1])
+            
             dimentioner_res_0 = [i for i in range(len(self.res[1]))]
-            plt.plot(dimentioner_res_0, self.res[1]) #draw Z-t, X-t, Y-t to analyse if stable manifold etc.
-            #plt.plot(self.res[2], self.res[0]) #self.res[0] is values corresponding to x, [1] to y, [2] to z
+            plt.plot(self.res[1], self.res[2]) #draw Z-t, X-t, Y-t to analyse if stable manifold etc.
+            plt.show()
             
             self.__plot() #calls out function to plot in 3D
 
