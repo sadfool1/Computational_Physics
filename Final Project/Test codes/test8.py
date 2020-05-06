@@ -24,6 +24,7 @@ from matplotlib.figure import Figure
 from matplotlib import style
 from mpl_toolkits.mplot3d import Axes3D #imports the 3D 
 import time
+from tkinter import TclError
 import matplotlib 
 matplotlib.use("TkAgg") #Backend of Matplotlib and we pull out TkAgg
 
@@ -117,7 +118,8 @@ class LorenzAttractorRungeKutta():
             
             self.root.mainloop()
             
-        except _tkinter.TclError:
+        except tk.TclError:
+            print (messagebox.showinfo("Invalid!", "Please make sure to enter valid inputs (i.e. integers or floats"))
             
         
         
@@ -140,14 +142,14 @@ class LorenzAttractorRungeKutta():
         global graphframe
 
         try:
+            r_info = user_r_entry.get() #This obtains the user input for r
+            sigma_info = user_sigma_entry.get() #This obtains the user input for sigma
+            b_info = user_b_entry.get()  #This obtains the user input for b
+            
             print ("")
             print ("==============================================")
             print ("                SYSTEM REPORT")                   
             timeinit = time.process_time() #start timer to get execution time
-            
-            r_info = user_r_entry.get() #This obtains the user input for r
-            sigma_info = user_sigma_entry.get() #This obtains the user input for sigma
-            b_info = user_b_entry.get()  #This obtains the user input for b
                         
             print ("User entered: \n r     = %f \n sigma = %f \n b     = %f \n" 
                    % (r_info, sigma_info, b_info)) #Printing System reports in kernel
@@ -186,8 +188,9 @@ class LorenzAttractorRungeKutta():
             print ("==============================================")
 
 
-        except Exception:
-            raise
+        except tk.TclError:
+            print (messagebox.showinfo("Invalid!", "Please Enter Valid Inputs (i.e. integers or floats)"))
+            print ("")
             
     
     def clear(self): #FigureCanvasTkAgg has no module to delete canvas, hence i am forcing close and reopen of the app
@@ -224,6 +227,3 @@ if __name__ == '__main__':
         traceback.print_exc()
         sys.exit(1)
 
-
-        
-    
