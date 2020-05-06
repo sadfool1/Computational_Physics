@@ -6,11 +6,8 @@ Computational Physics Final Project
 Project title: "Lorenz Equations"
 """
 
-"""
-==================
-Initialise Imports
-=================
-"""
+
+#Initialise Imports
 import sys
 import traceback
 import matplotlib.pyplot as plt
@@ -28,13 +25,10 @@ from tkinter import TclError
 import matplotlib 
 matplotlib.use("TkAgg") #Backend of Matplotlib and we pull out TkAgg
 
-
-
 class LorenzAttractorRungeKutta():
     DT            = 1e-3     # Differential interval
-    STEP          = 100000   # Time step count
-    X_0, Y_0, Z_0 = random.random(),random.random(),random.random()
-    
+    STEP          = 100000   # Time step count (discretized)
+    X_0, Y_0, Z_0 = random.random(),random.random(),random.random() #randomised initial values
     
     def __init__(self,*args, **kwargs):
         
@@ -64,69 +58,64 @@ class LorenzAttractorRungeKutta():
         management
         =====================
         """
-        try:
             
-            self.root = Tk()
-            self.root.grid()
-            self.root.title("Lorenz Simulation")
-            self.root.geometry = ("700x700")
-            self.root.resizable = (True, True)
-            
-            self.res = [[], [], []] #initialise list to keep the values
-            
-            controlframe = LabelFrame(self.root, text = "Parameter Control")
-            controlframe.grid(row = 1, column = 0) #this creates a frame for the entries
-            
-             #DoubleVar allows the user to enter float values
-            user_r_entry = DoubleVar()
-            r_entry = Entry(controlframe, textvariable = user_r_entry).grid(row = 1, column = 0)
-            self.root.r_label = Label(controlframe, text="r value", height = 1, width = 12).grid(row=2, column=0, columnspan=1)
-            
-            #DoubleVar allows the user to enter float values
-            user_sigma_entry = DoubleVar() 
-            sigma_entry = Entry(controlframe, textvariable = user_sigma_entry).grid(row = 1, column = 1)
-            self.root.sigma_label = Label(controlframe, text="sigma value", height = 1, width = 12).grid(row=2, column=1, columnspan=1)
-            
-             #DoubleVar allows the user to enter float values
-            user_b_entry = DoubleVar() 
-            b_entry = Entry(controlframe, textvariable = user_b_entry).grid(row = 1, column = 2)
-            self.root.b_label = Label(controlframe, text="b value", height = 1, width = 12).grid(row=2, column=2, columnspan=1)
-            """
-            ============================
-            3 Buttons to Plot, Clear or
-            Quit
-            ============================
-            """
-            self.plot_button1 = Button (self.root, 
-                                        command = self.click1, 
-                                        height = 2, 
-                                        width = 8, 
-                                        text = "Run").grid(row = 2, column = 0) 
-            
-            self.plot_button2 = Button (self.root, 
-                                        command = self.Quit, 
-                                        height = 2, 
-                                        width = 8, 
-                                        text = "Quit").grid(row = 4, column = 0) 
-            self.plot_button3 = Button (self.root, 
-                                command = self.clear, 
-                                height = 2, 
-                                width = 8, 
-                                text = "Clear").grid(row = 3, column = 0)
-            
-            graphframe = LabelFrame (self.root, text = "Graph") #creates a graph frame
-            graphframe.grid(row = 0, column = 0)
-            
-            fig = Figure() #initialiase this into a Figure to be placed in canvas below
-            self.canvas = FigureCanvasTkAgg(fig, master = graphframe)
-            
-            self.root.mainloop()
-            
-        except tk.TclError:
-            print (messagebox.showinfo("INVALID", "Please make sure to enter valid inputs (i.e. integers or floats"))
-            
+        self.root = Tk()
+        self.root.grid()
+        self.root.title("Lorenz Simulation")
+        self.root.geometry = ("700x700")
+        self.root.resizable = (True, True)
         
+        self.res = [[], [], []] #initialise list to keep the values
         
+        controlframe = LabelFrame(self.root, text = "Parameter Control")
+        controlframe.grid(row = 1, column = 0) #this creates a frame for the entries
+        
+         #DoubleVar allows the user to enter float values
+        user_r_entry = DoubleVar()
+        r_entry = Entry(controlframe, textvariable = user_r_entry).grid(row = 1, column = 0)
+        self.root.r_label = Label(controlframe, text="r value", height = 1, width = 12).grid(row=2, column=0, columnspan=1)
+        
+        #DoubleVar allows the user to enter float values
+        user_sigma_entry = DoubleVar() 
+        sigma_entry = Entry(controlframe, textvariable = user_sigma_entry).grid(row = 1, column = 1)
+        self.root.sigma_label = Label(controlframe, text="sigma value", height = 1, width = 12).grid(row=2, column=1, columnspan=1)
+        
+         #DoubleVar allows the user to enter float values
+        user_b_entry = DoubleVar() 
+        b_entry = Entry(controlframe, textvariable = user_b_entry).grid(row = 1, column = 2)
+        self.root.b_label = Label(controlframe, text="b value", height = 1, width = 12).grid(row=2, column=2, columnspan=1)
+        """
+        ============================
+        3 Buttons to Plot, Clear or
+        Quit
+        ============================
+        """
+        self.plot_button1 = Button (self.root, 
+                                    command = self.click1, 
+                                    height = 2, 
+                                    width = 8, 
+                                    text = "Run").grid(row = 2, column = 0) 
+        
+        self.plot_button2 = Button (self.root, 
+                                    command = self.Quit, 
+                                    height = 2, 
+                                    width = 8, 
+                                    text = "Quit").grid(row = 4, column = 0)
+        
+        self.plot_button3 = Button (self.root, 
+                            command = self.clear, 
+                            height = 2, 
+                            width = 8, 
+                            text = "Clear").grid(row = 3, column = 0)
+        
+        graphframe = LabelFrame (self.root, text = "Graph") #creates a graph frame
+        graphframe.grid(row = 0, column = 0)
+        
+        fig = Figure() #initialiase this into a Figure to be placed in canvas below
+        self.canvas = FigureCanvasTkAgg(fig, master = graphframe)
+        
+        self.root.mainloop()
+            
     def click1(self):
         
         """
@@ -181,12 +170,12 @@ class LorenzAttractorRungeKutta():
             ax.set_zlabel("z")
             
             self.canvas = FigureCanvasTkAgg(fig, master = graphframe) #This embeds the graph into Tkinter, places this with its master in graphframe
-            ax.plot(self.res[0], self.res[1], self.res[2], color="red", lw=1) 
+            ax.plot(self.res[0], self.res[1], self.res[2], color="blue", lw=1) 
     
             self.canvas.draw() #main app that draws and embeds the graph onto tkinter app
             self.canvas.get_tk_widget().grid(row = 0, column = 0) #.grid places the object on the window.
             
-            timeend = time.process_time()
+            timeend = time.process_time() #timer for end of time
             timer =  timeend - timeinit #this obtians the time taken to excecute
             print ("Time taken to execute: %f seconds " % timer)
             print ("                 END OF REPORT                ")
@@ -200,14 +189,15 @@ class LorenzAttractorRungeKutta():
     
     def clear(self): #FigureCanvasTkAgg has no module to delete canvas, hence i am forcing close and reopen of the app
         self.root.destroy() #destroy main app 
-        LorenzAttractorRungeKutta() #reset new one
+        LorenzAttractorRungeKutta() #reset the application into original state.
         
     def __lorenz(self, xyz): #Lorenz equation returned in a list
         global r_info
         global sigma_info
         global b_info
         
-        p = sigma_info
+        #re-assigning the values to match the equation
+        p = sigma_info 
         r = r_info
         b = b_info
         
@@ -219,7 +209,7 @@ class LorenzAttractorRungeKutta():
 
             
     def Quit(self):
-        print ("Program Quitting..")
+        print ("Exiting Program...")
         self.root.quit() #Quit program
 
 
