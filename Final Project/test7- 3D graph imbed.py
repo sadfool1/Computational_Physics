@@ -44,14 +44,11 @@ class LorenzAttractorRungeKutta(tk.Frame):
         self.root = Tk()
         self.root.grid()
         self.root.title("Lorenz Simulation")
-        self.root.geometry = ("500x500")
+        self.root.geometry = ("700x700")
         self.root.resizable = (False, False)
         
         self.res = [[], [], []]
-
         
-        #self.root.graphframe = LabelFrame(master = self.root, text = "Phase Space")
-        #self.root.label1 = Label(self.root.graphframe, text="Graph", height = 3, width = 15).grid(row=5, column=0, columnspan=10)
         user_r_entry = DoubleVar()
         r_entry = Entry(self.root, textvariable = user_r_entry).grid(row = 1, column = 0)
         self.root.r_label = Label(self.root, text="r value", height = 1, width = 12).grid(row=2, column=0, columnspan=1)
@@ -64,8 +61,18 @@ class LorenzAttractorRungeKutta(tk.Frame):
         b_entry = Entry(self.root, textvariable = user_b_entry).grid(row = 1, column = 2)
         self.root.b_label = Label(self.root, text="b value", height = 1, width = 12).grid(row=2, column=2, columnspan=1)
         
-        self.plot_button1 = Button (self.root, command = self.click1, height = 2, width = 8, text = "Run").grid(row = 3, column = 1)
-        self.plot_button2 = Button (self.root, command = self.root.destroy, height = 2, width = 8, text = "Quit").grid(row = 4, column = 1)
+        self.plot_button1 = Button (self.root, 
+                                    command = self.click1, 
+                                    height = 2, 
+                                    width = 8, 
+                                    text = "Run").grid(row = 3, column = 1)
+        
+        self.plot_button2 = Button (self.root, 
+                                    command = self.Quit, 
+                                    height = 2, 
+                                    width = 8, 
+                                    text = "Quit").grid(row = 4, column = 1)
+        
         self.root.mainloop()
         
         
@@ -141,7 +148,8 @@ class LorenzAttractorRungeKutta(tk.Frame):
 
             
     def Quit(self):
-        self.root.destroy()
+        print ("Program Quitting..")
+        self.root.quit()
 
 
 if __name__ == '__main__':
