@@ -6,7 +6,6 @@ Computational Physics Final Project
 Project title: "Lorenz Equations"
 """
 
-
 #Initialise Imports
 import sys
 import traceback
