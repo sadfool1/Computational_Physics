@@ -49,9 +49,6 @@ class LorenzAttractorRungeKutta(tk.Frame):
         
         self.res = [[], [], []]
 
-        self.root.graphframe = LabelFrame(master = self.root, text = "Phase Space")
-        self.root.label1 = Label(self.root.graphframe, text="Graph", height = 3, width = 15)
-        self.root.label1.grid(row=0, column=0, columnspan=10)
         
         #self.root.graphframe = LabelFrame(master = self.root, text = "Phase Space")
         #self.root.label1 = Label(self.root.graphframe, text="Graph", height = 3, width = 15).grid(row=5, column=0, columnspan=10)
@@ -110,13 +107,14 @@ class LorenzAttractorRungeKutta(tk.Frame):
                     self.res[i].append(xyz[i])
             
             
-            fig = plt.figure()
-            ax = Axes3D(fig)
-            ax.set_xlabel("x")
-            ax.set_ylabel("y")
-            ax.set_zlabel("z")
-            
-            ax.plot(self.res[0], self.res[1], self.res[2], color="red", lw=1) 
+            f = Figure(figsize=(5,5), dpi=100)
+            a = f.add_subplot(111)
+            a.plot(self.res[0],self.res[1])
+    
+            canvas = FigureCanvasTkAgg(f, master = self.root)
+            canvas.draw()
+            canvas.get_tk_widget().grid(row = 0, column = 1)
+
 
         except Exception as e:
             raise
