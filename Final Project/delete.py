@@ -53,7 +53,7 @@ class LorenzAttractorRungeKutta:
         except Exception as e:
             raise
 
-    def __lorenz(self, xyz, p=10, r=0.1
+    def __lorenz(self, xyz, p=10, r=0.5
                  , b=8/3.0):
         """ Lorenz equation
         :param  list xyz
