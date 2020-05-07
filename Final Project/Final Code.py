@@ -177,6 +177,7 @@ class LorenzAttractorRungeKutta():
             timeend = time.process_time() #timer for end of time
             timer =  timeend - timeinit #this obtians the time taken to excecute
             print ("Time taken to execute: %f seconds " % timer)
+            print ("")
             print ("                 END OF REPORT                ")
             print ("==============================================")
 
