@@ -72,17 +72,33 @@ class LorenzAttractorRungeKutta():
          #DoubleVar allows the user to enter float values
         user_r_entry = DoubleVar()
         r_entry = Entry(controlframe, textvariable = user_r_entry).grid(row = 1, column = 0)
-        self.root.r_label = Label(controlframe, text="r value", height = 1, width = 12).grid(row=2, column=0, columnspan=1)
+        self.root.r_label = Label(controlframe, 
+                                  text="r value", 
+                                  height = 1, 
+                                  width = 12).grid(row=2,
+                                            column=0, 
+                                            columnspan=1)
         
         #DoubleVar allows the user to enter float values
         user_sigma_entry = DoubleVar() 
         sigma_entry = Entry(controlframe, textvariable = user_sigma_entry).grid(row = 1, column = 1)
-        self.root.sigma_label = Label(controlframe, text="sigma value", height = 1, width = 12).grid(row=2, column=1, columnspan=1)
+        self.root.sigma_label = Label(controlframe, 
+                                      text="sigma value", 
+                                      height = 1, 
+                                      width = 12).grid(row=2, 
+                                                column=1, 
+                                                columnspan=1)
         
          #DoubleVar allows the user to enter float values
         user_b_entry = DoubleVar() 
         b_entry = Entry(controlframe, textvariable = user_b_entry).grid(row = 1, column = 2)
-        self.root.b_label = Label(controlframe, text="b value", height = 1, width = 12).grid(row=2, column=2, columnspan=1)
+        self.root.b_label = Label(controlframe, 
+                                  text="b value", 
+                                  height = 1, 
+                                  width = 12).grid(row=2, 
+                                            column=2, 
+                                            columnspan=1)
+        
         """
         ============================
         3 Buttons to Plot, Clear or
@@ -113,7 +129,7 @@ class LorenzAttractorRungeKutta():
         fig = Figure() #initialiase this into a Figure to be placed in canvas below
         self.canvas = FigureCanvasTkAgg(fig, master = graphframe)
         
-        self.root.mainloop()
+        self.root.mainloop() #runs the main loop and starts the programme
             
     def click1(self):
         
