@@ -2,7 +2,7 @@
 Author: James Morillo
 Matric: U1740375H
 SPMS
-Computational Physics Final Project 
+PH4419-COMPUTATIONAL PHYSICS Final Project 
 Project title: "Lorenz Equations"
 """
 
