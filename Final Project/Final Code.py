@@ -67,11 +67,14 @@ class LorenzAttractorRungeKutta():
         self.res = [[], [], []] #initialise list to keep the values
         
         controlframe = LabelFrame(self.root, text = "Parameter Control")
-        controlframe.grid(row = 1, column = 0) #this creates a frame for the entries
+        controlframe.grid(row = 1, column = 0) 
+        #this creates a frame for the entries
         
          #DoubleVar allows the user to enter float values
         user_r_entry = DoubleVar()
-        r_entry = Entry(controlframe, textvariable = user_r_entry).grid(row = 1, column = 0)
+        r_entry = Entry(controlframe, 
+                        textvariable = user_r_entry).grid(row = 1, 
+                                                   column = 0)
         self.root.r_label = Label(controlframe, 
                                   text="r value", 
                                   height = 1, 
@@ -81,7 +84,9 @@ class LorenzAttractorRungeKutta():
         
         #DoubleVar allows the user to enter float values
         user_sigma_entry = DoubleVar() 
-        sigma_entry = Entry(controlframe, textvariable = user_sigma_entry).grid(row = 1, column = 1)
+        sigma_entry = Entry(controlframe, 
+                            textvariable = user_sigma_entry).grid(row = 1, 
+                                                           column = 1)
         self.root.sigma_label = Label(controlframe, 
                                       text="sigma value", 
                                       height = 1, 
@@ -91,7 +96,8 @@ class LorenzAttractorRungeKutta():
         
          #DoubleVar allows the user to enter float values
         user_b_entry = DoubleVar() 
-        b_entry = Entry(controlframe, textvariable = user_b_entry).grid(row = 1, column = 2)
+        b_entry = Entry(controlframe, 
+                        textvariable = user_b_entry).grid(row = 1, column = 2)
         self.root.b_label = Label(controlframe, 
                                   text="b value", 
                                   height = 1, 
