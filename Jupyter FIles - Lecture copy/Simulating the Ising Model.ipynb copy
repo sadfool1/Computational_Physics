@@ -1,0 +1,378 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# Simulating the Ising Model\n",
+    "\n",
+    "In 1924, Ernst Ising solved a toy model of magnetism invented by his supervisor Wilhelm Lenz, and the model forever bore his name.\n",
+    "\n",
+    "<table>\n",
+    "<tr>\n",
+    "<td><img src=\"https://academictree.org/photo/007/cache.071037.Wilhelm_Lenz.jpg\" width=100></td>\n",
+    "<td><img src=\"https://photos.geni.com/p13/e9/15/76/0b/53444840a1dbaf51/ising_ernst_large.jpg\" width=110></td>\n",
+    "</tr>\n",
+    "<tr>\n",
+    "<td>Wilhelm Lenz (1888-1957)</td>\n",
+    "<td>Ernst Ising (1900-1998)</td>\n",
+    "</tr>\n",
+    "</table>\n",
+    "\n",
+    "The Ising model that Ising solved is one-dimensional, and its behaviour is determined by its Hamiltonian\n",
+    "\\begin{equation}\n",
+    "H = -\\sum_i \\left[J_i s_{i+1} + h_i\\right] s_i.\n",
+    "\\end{equation}\n",
+    "In this model, the degrees of freedom are the spins $s_i$ at site $i = 1, \\dots, N$, which can take on values $s_i = \\pm 1$. The Hamiltonian, or the total energy of the Ising system, has two parts, $s_i$ interacting with a local magnetic field $h_i$, and $s_i$ interacting with its neighbor $s_{i+1}$ through a coupling constant $J_i$.\n",
+    "\n",
+    "Since physical systems 'like' to have its total energy minimized, the effect of $h_i$ is to make $s_i$ align along the same direction as itself, so that $h_is_i > 0$, and its contribution to $H$ is negative. For the exchange term $-J_i s_i s_{i+1}$, $s_i$ and $s_{i+1}$ tends to align with each other if $J_i > 0$ (ferromagnetic), but anti-align with each other if $J_i < 0$ (anti-ferromagnetic)."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "<b>Example.</b> Suppose we have a one-dimensional Ising model, with $J_i = J = 1$ and $h_i = 0$. Then for the 5-spin configuration $(s_1, s_2, s_3, s_4, s_5) = (+1, +1, -1, +1, -1)$ we have\n",
+    "\\begin{equation}\n",
+    "\\begin{aligned}\n",
+    "H(+1, +1, -1, +1, -1) &= -s_1s_2 - s_2s_3 - s_3s_4 - s_4s_5 \\\\\n",
+    "&= -(+1)(+1) - (+1)(-1) - (-1)(+1) - (+1)(-1) \\\\\n",
+    "&= -1 + 1 + 1 + 1 = 2.\n",
+    "\\end{aligned}\n",
+    "\\end{equation}"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Because of the coupling between spins, the partition function\n",
+    "\\begin{equation}\n",
+    "Z[\\{s_i\\}] = \\sum_{\\{s_i = \\pm 1\\}} \\exp\\left[-\\beta H[\\{s_i\\}]\\right] \\neq \\prod_i \\sum_{s_i = \\pm 1} \\exp[-\\beta H(s_i)].\n",
+    "\\end{equation}\n",
+    "This is probably why Lenz and Ising initially expected the thermodynamics of this model to be non-trivial.\n",
+    "\n",
+    "The partition function $Z[\\{s_i\\}]$ is non-trivial, but it has been solved exactly (by Ising, for example), or approximately using various approximation methods. The exact or approximate partition function is then used to calculate various thermodynamic quantities.\n",
+    "\n",
+    "In this computational physics course, our goal of course is to calculate the various thermodynamic quantities, like $\\langle E\\rangle$, $\\langle C\\rangle$, $\\langle s_i\\rangle$, etc, by simulating statistical fluctations of the system of spins."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "# The Metropolis Algorithm\n",
+    "\n",
+    "The simplest method to simulate the Ising model is to use the Metropolis algorithm, invented by Nicholas Metropolis in 1953.\n",
+    "\n",
+    "<table>\n",
+    "<tr>\n",
+    "<td><img src=\"https://upload.wikimedia.org/wikipedia/commons/5/56/Nicholas_Metropolis_cropped.PNG\" width=100></td>\n",
+    "</tr>\n",
+    "<tr><td>Nicholas Metropolis (1915-1999)</td></tr>\n",
+    "</table>\n",
+    "\n",
+    "The algorithm is very simple.\n",
+    "\n",
+    "Suppose we are given an initial spin configuration $\\vec{\\sigma}_i = \\{s_i\\}$.\n",
+    "\n",
+    "<ol>\n",
+    "<li> We calculate its total energy $E_i[\\vec{\\sigma}_i] = -\\sum_i \\left[J_i s_i s_{i+1} + h_i s_i\\right]$;\n",
+    "<li> We select a random spin $s_k$ and flip it, so that the new spin configuration is $\\vec{\\sigma}_f = \\{s_1, s_2, \\dots, s_{k-1}, -s_k, s_{k+1}, \\dots, s_N\\}$;\n",
+    "<li> We calculate the total energy $E_f[\\vec{\\sigma}_f]$ in the same way we calculated $E_i[\\vec{\\sigma}_i]$;\n",
+    "<li> If $E_f < E_i$, we accept the new spin configuration with unit probability;\n",
+    "<li> Else if $E_f > E_i$, we accept the new spin configuration with probability $p = \\exp[-\\beta(E_f - E_i)]$, where $\\beta = 1/k_BT$ is the inverse temperature.\n",
+    "</ol>\n",
+    "\n",
+    "If we repeat Steps (2) to (5), then it does not matter what initial spin configuration we started out with, we will always end up in the equilibrium ensemble of spin configurations."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Principle of Detailed Balance\n",
+    "\n",
+    "This is guaranteed by the <em>Principle of Detailed Balance</em>.\n",
+    "\n",
+    "To state the principle, let us suppose $i$ and $j$ are arbitrary states of a system, and $P(i)$ and $P(j)$ are the probabilities of us finding the system in states $i$ and $j$ respectively.\n",
+    "\n",
+    "Let us further suppose that there are transitions between $i$ and $j$, such that $W_{i \\leftarrow j}$ is the rate at which the system transition from state $j$ to state $i$, and $W_{j \\leftarrow i}$ is the rate at which the system transition from state $i$ to state $j$.\n",
+    "\n",
+    "The Principle of Detailed Balance then states that, if\n",
+    "\\begin{equation}\n",
+    "W_{i \\leftarrow j} P(j) = W_{j \\leftarrow i} P(i)\n",
+    "\\end{equation}\n",
+    "for arbitrary states $i$ and $j$, the system is in thermodynamic equilibrium."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Let us check that this is true for the Metropolis algorithm.\n",
+    "\n",
+    "First, let us assume that the simulation has gone on long enough that\n",
+    "\\begin{equation}\n",
+    "P(i) = \\frac{\\exp(-\\beta E_i)}{Z}, \\quad\n",
+    "P(j) = \\frac{\\exp(-\\beta E_j)}{Z},\n",
+    "\\end{equation}\n",
+    "where $Z$ is the partition function of the system.\n",
+    "\n",
+    "Next, let us further assume that $E_i < E_j$.\n",
+    "\n",
+    "Then, from the Metropolis algorithm, we know that $W_{i \\leftarrow j} = 1$ and $W_{j \\leftarrow i} = \\exp[-\\beta(E_j - E_i)]$.\n",
+    "\n",
+    "With these, we finally check that\n",
+    "\\begin{equation}\n",
+    "W_{i \\leftarrow j} P(j) = \\frac{\\exp(-\\beta E_j)}{Z}\n",
+    "\\end{equation}\n",
+    "and\n",
+    "\\begin{equation}\n",
+    "W_{j \\leftarrow i} P(i) = \\exp[-\\beta(E_j - E_i)] \\frac{\\exp(-\\beta E_i)}{Z} = \\frac{\\exp(-\\beta E_j)}{Z}.\n",
+    "\\end{equation}\n",
+    "Indeed, the Principle of Detailed Balanced is satisfied."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 1D Ising Simulation\n",
+    "\n",
+    "Let us simulate a 1D Ising chain of 10 spins subject to periodic boundary conditions."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "import numpy as np\n",
+    "# allocate memory for the 1D Ising chain\n",
+    "S = np.zeros(10)\n",
+    "# random initial condition for the 10 spins\n",
+    "for i in range(10):\n",
+    "    if np.random.rand() < 0.5:\n",
+    "        S[i] = 1.0\n",
+    "    else:\n",
+    "        S[i] = -1.0\n",
+    "# set parameters J_i = J = 1.0 and h_i = h = 0.2\n",
+    "J = 1.0\n",
+    "h = 0.2\n",
+    "# set inverse temperature\n",
+    "beta = 10.0\n",
+    "# number of Monte Carlo moves\n",
+    "T = 100"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Suppose we chose to flip $S_i$, then the total energy before the flip would be\n",
+    "\\begin{equation}\n",
+    "E_i = -J[S_0 S_1 + S_1 S_2 + \\cdots + S_{i-1} S_i + S_i S_{i+1} + \\cdots + S_8 S_9 + S_9 S_0] - h[S_0 + S_1 + \\cdots + S_i + \\cdots + S_8 + S_9],\n",
+    "\\end{equation}\n",
+    "whereas the total energy after the flip $S_i \\to -S_i$ would be\n",
+    "\\begin{equation}\n",
+    "E_f = -J[S_0 S_1 + S_1 S_2 + \\cdots - S_{i-1} S_i - S_i S_{i+1} + \\cdots + S_8 S_9 + S_9 S_0] - h[S_0 + S_1 + \\cdots - S_i + \\cdots + S_8 + S_9],\n",
+    "\\end{equation}\n",
+    "which tells us that\n",
+    "\\begin{equation}\n",
+    "E_f - E_i = 2 J [ S_{i-1} S_i + S_i S_{i+1} ] + 2 h S_i = 2 S_i [J (S_{i-1} + S_{i+1}) + h].\n",
+    "\\end{equation}\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# simulate T Monte Carlo moves\n",
+    "for t in range(T):\n",
+    "    # pick a random spin\n",
+    "    i = np.random.randint(0,10)\n",
+    "    # calculate energy change\n",
+    "    if i == 0:\n",
+    "        dE = 2*S[i]*(J*(S[-1]+S[i+1]) + h)\n",
+    "    elif i == 9:\n",
+    "        dE = 2*S[i]*(J*(S[i-1]+S[0]) + h)\n",
+    "    else:\n",
+    "        dE = 2*S[i]*(J*(S[i-1]+S[i+1]) + h)\n",
+    "    # check dE and decide whether or not to accept move\n",
+    "    if dE < 0:\n",
+    "        # accept spin flip\n",
+    "        S[i] = -S[i]\n",
+    "    else:\n",
+    "        # draw a uniformly distributed random number\n",
+    "        r = np.random.rand()\n",
+    "        # check whether to accept spin flip\n",
+    "        if r < np.exp(-beta*dE):\n",
+    "            # accept spin flip\n",
+    "            S[i] = -S[i]\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "The simulation is complete, but how do we visualize it?\n",
+    "\n",
+    "For 1D Ising chains, we can store the chain after each Monte Carlo move as one row in a matrix, and later visualize the matrix.\n",
+    "\n",
+    "To do this, let us initialize <tt>S</tt> as a $100 \\times 10$ matrix, and change the updates within the <tt>for</tt>-loop."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# allocate memory for the 1D Ising chain\n",
+    "S = np.zeros((100,10))\n",
+    "# random initial condition for the 10 spins\n",
+    "for i in range(10):\n",
+    "    if np.random.rand() < 0.5:\n",
+    "        S[0,i] = 1.0\n",
+    "    else:\n",
+    "        S[0,i] = -1.0"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": [
+    "# simulate T Monte Carlo moves\n",
+    "for t in range(1,T):\n",
+    "    # copy S[t-1,i] to S[t,i]\n",
+    "    for i in range(10):\n",
+    "        S[t,i] = S[t-1,i]\n",
+    "    # pick a random spin\n",
+    "    i = np.random.randint(0,10)\n",
+    "    # calculate energy change\n",
+    "    if i == 0:\n",
+    "        dE = 2*S[t-1,i]*(J*(S[t-1,-1]+S[t-1,i+1]) + h)\n",
+    "    elif i == 9:\n",
+    "        dE = 2*S[t-1,i]*(J*(S[t-1,i-1]+S[t-1,0]) + h)\n",
+    "    else:\n",
+    "        dE = 2*S[t-1,i]*(J*(S[t-1,i-1]+S[t-1,i+1]) + h)\n",
+    "    # check dE and decide whether or not to accept move\n",
+    "    if dE < 0:\n",
+    "        # accept spin flip\n",
+    "        S[t,i] = -S[t,i]\n",
+    "    else:\n",
+    "        # draw a uniformly distributed random number\n",
+    "        r = np.random.rand()\n",
+    "        # check whether to accept spin flip\n",
+    "        if r < np.exp(-beta*dE):\n",
+    "            # accept spin flip\n",
+    "            S[t,i] = -S[t,i]\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "Now that the simulation is complete, let us visualize the outcome of the simulation using the <tt>matshow()</tt> function in <tt>matplotlib</tt>."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "<matplotlib.figure.Figure at 0x10e79a438>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    },
+    {
+     "data": {
+      "image/png": "iVBORw0KGgoAAAANSUhEUgAAAM0AAAOfCAYAAABrEkcIAAAABHNCSVQICAgIfAhkiAAAAAlwSFlz\nAAALEgAACxIB0t1+/AAAADl0RVh0U29mdHdhcmUAbWF0cGxvdGxpYiB2ZXJzaW9uIDIuMS4wLCBo\ndHRwOi8vbWF0cGxvdGxpYi5vcmcvpW3flQAAIABJREFUeJzt3XusnHd95/HPp3acFFg2ThzA2IYY\nrUtJS5uwRy4UiW1zIYFWcXYX2kTb1qCgaCUCFHpJUlawSosUdquGVopYvEnALYiEGlC8rVs3N7Za\n0YQ44E1iu8HGsMmpDbkDaiDB9nf/mMdlOJzbZ2bsMye/9ysanXku88zjUT7n+53fczmuKgGYv59Y\n6B0AFhtCA4QIDRAiNECI0AAhQgOEFiw0ti+w/aDtfbavHHAba2zfaXuP7V223zPE/iyx/RXbfzXE\nNk62vcX2P3b79LoBt/Pe7t/zgO1P2z5p0H3C6C1IaGwvkXSdpDdJOkPSJbbPGGBThyT9TlW9StJr\nJb1zwO1I0nsk7RnwtUf9qaS/raqflvTzg2zP9ipJ75Y0UVU/K2mJpIuH3C+M0EJVmvWS9lXV/qp6\nVtJNkjakG6mqg1X15e75d9X7n3RVuh3bqyX9iqTr09f2beOFkt4g6YZuf56tqqcG3NxSST9pe6mk\n50k6MOh+YfQWKjSrJD3cNz2pAf5n72f7dElnSbp7gJd/RNLvSzoyxC68QtKjkj7etXnX235+upGq\n+idJfyzpIUkHJX27qv5uiP3CiC1UaDzNvIHP57H9AkmflfTbVfWd8LW/KumRqrp30PfvLJX0Gkkf\nraqzJP2zpPi7mu3l6lXdtZJeKun5tn9jyH3DCC1UaCYlrembXq0BWxDbJ6gXmE9V1ecG2MTrJV1o\n+xvqtYln2/7kANuZlDRZVUcr3Rb1QpQ6V9LXq+rRqvqBpM9J+sUBtoNjZKFCc4+kdbbX2l6m3hfd\nrelGbFu97xB7qupPBtmRqrqqqlZX1endftxRVfFv9qr6pqSHbb+ym3WOpN0D7NJDkl5r+3ndv+8c\nDT9AgRFauhBvWlWHbF8uabt6o0M3VtWuATb1ekm/Kel+2zu7eX9QVdtGtKupd0n6VPeLYL+kt6cb\nqKq7bW+R9GX1Rge/ImnTSPcSQzGXBgAZzggAQoQGCBEaIERogBChAUILGhrbl7GdY78djNZCV5pR\n/U/BdnDcLHRogEXnuB7cXHHKkjp9zQn/Mv3o44d12qlLfmSdr973vDm381M/9/SPTE+3nUEcy+3M\n59811Q/0jE7QiT8yb+q/fapvPPwDPfbE4elOiMWIDHUaje0L1Lvwaomk66vqmtnWP33NCfrS9jWz\nraLzX3rmnO+7ffvOOdcZN/P5d83HXP/29ec/POtyDG/g9myEV18Ci8ow32lGcvUlsNgME5p5XX1p\n+zLbO2zvePTxw0O8HTAehgnNvK6+rKpNVTVRVROj+JINLLRhQjOyqy+BxWSY0Izk6ktgsRl4yHmE\nV18Ci8pQx2m6y4oX6tJiYEFwGg0QIjRAiNAAIUIDhAgNECI0QIjQACFCA4QIDRAiNECI0AAhQgOE\nCA0QIjRAiNAAIUIDhAgNECI0QIjQACFCA4QIDRAiNECI0AAhQgOECA0QIjRAiNAAIUIDhAgNECI0\nQIjQACFCA4QIDRAiNECI0AAhQgOECA0QIjRAiNAAIUIDhAgNECI0QIjQACFCA4QIDRAiNECI0AAh\nQgOECA0QIjRAiNAAIUIDhAgNECI0QIjQACFCA4QIDRAiNECI0AAhQgOECA0QIjRAiNAAIUIDhAgN\nECI0QIjQACFCA4QIDRBautA7gB/afmDnQu8C5oFKA4QIDRAiNECI0AAhQgOECA0QIjRAiNAAIUID\nhAgNECI0QIjQACFCA4QIDRAiNECI0AAhQgOECA0QIjRAiNAAIUIDhAgNECI0QIjQACFCA4QIDRAi\nNECI0AAhQoOxZ/tG24/YfmCG5bb9Z7b32b7P9mv6lm20vbd7bBzF/hAaLAafkHTBLMvfJGld97hM\n0kclyfYpkj4o6RckrZf0QdvLh90ZQoOxV1V/L+mJWVbZIOnPq+cuSSfbXinpfEm3VtUTVfWkpFs1\ne/jmhb9P07Dzf/n59fgThxd6N3Tvfc/skvT9vlmbqmpTsIlVkh7um57s5s00fyiEpmGPP3FYX9r+\nsoXeDS1Zuff7VTUxxCY8zbyaZf5QaM/wXDApaU3f9GpJB2aZPxRC07CSdGQM/huBrZJ+qxtFe62k\nb1fVQUnbJb3R9vJuAOCN3byh0J4dJ/w9zcHZ/rSkX5K0wvakeiNiJ0hSVf0PSdskvVnSPklPS3p7\nt+wJ238o6Z5uU1dX1WwDCvNCaDD2quqSOZaXpHfOsOxGSTeOcn8ITdNKh2sk7VFT+E4DhKg0DesN\nBAw9AtscKg0QIjRAiPascSM6TtIUKg0QIjRAiPasYaXS4WL0LEWlAUJUmsZxnCZHpQFChAYI0Z41\nrCQdpj2LUWmAEKEBQrRnjWP0LEelAUJUmoaVxBkBA6DSACFCA4RozxrH1TQ5Kg0QotI0rFScETAA\nKg0QIjRAiPasZSUdpjuLUWmAEKEBQrRnDevdlhYpKg0QotI0zTo87Z+lxGyoNECI0AAh2rOGlaQj\nHKeJUWmAEJWmcQwE5Kg0QIjQACHas4b17rBJe5ai0gAhQgOEaM8ad6Roz1JUGiBEpWkYAwGDodIA\nIUIDhGjPGlayDvN7M8YnBoQIDRCiPWscx2lyVBogRKVpGMdpBkOlAUKEBgjRnjXNOlz83kzxiQEh\nKk3Devdy5vdmik8MCBEaIER71jiO0+SoNEBoztDYXmP7Ttt7bO+y/Z5u/im2b7W9t/u5/NjvLrDw\n5tOeHZL0O1X1Zdv/StK9tm+V9DZJt1fVNbavlHSlpCuO3a5i1Ko4TjOIOT+xqjpYVV/unn9X0h5J\nqyRtkLS5W22zpIuO1U4C4yQaCLB9uqSzJN0t6cVVdVDqBcv2i0a+dzjmjjAQEJt3bbb9AkmflfTb\nVfWd4HWX2d5he8ejjx8eZB+BsTKv0Ng+Qb3AfKqqPtfN/pbtld3ylZIeme61VbWpqiaqauK0U5eM\nYp+BBTVne2bbkm6QtKeq/qRv0VZJGyVd0/285ZjsIY6Z3vU0DASk5vOd5vWSflPS/bZ3dvP+QL2w\nfMb2pZIekvTWY7OLwHiZMzRV9X+kGb8tnjPa3cHxxZDzIPjEgBChAUKcsNkwrqcZDJ8Yxp7tC2w/\naHtfd8rW1OXX2t7ZPb5q+6m+ZYf7lm0dxf5QaTDWbC+RdJ2k8yRNSrrH9taq2n10nap6b9/671Lv\nrJWjvldVZ45ynwhN4w6P/x0210vaV1X7Jcn2Teqd97h7hvUvkfTBY7lDtGcYd6skPdw3PdnN+zG2\nXy5praQ7+maf1J3GdZftkZxUPHaVZvuBnXOvhJEYoz+1scL2jr7pTVW1qXs+XSmsGbZzsaQtVdV/\nkuPLquqA7VdIusP2/VX1tWF2duxCgyY9VlUTMyyblLSmb3q1pAMzrHuxpHf2z6iqA93P/ba/oN73\nnaFCMxa/ZoBZ3CNpne21tpepF4wfGwWz/UpJyyX9Q9+85bZP7J6vUO+UsJm+C80blaZxR8b8NJqq\nOmT7cknbJS2RdGNV7bJ9taQdVXU0QJdIuqmq+lu3V0n6mO0j6hWIa/pH3QZFaDD2qmqbpG1T5n1g\nyvR/neZ1X5T06lHvz3j/mgHGEJWmYVxPMxg+MSBEpWlYyYvhjICxQ6UBQoQGCNGeNY7raXJ8YkCI\nStOwKnFjjQHwiQEhQgOEaM+aZm6APgAqDRAiNECI9qxhJUbPBsEnBoSoNI3j0oAcnxgQIjRAiPas\nYSXrCNfTxKg0QIhK0zgGAnJ8YkCI0AAh2rOGlcb/DpvjiE8MCBEaIER71jTrMNfTxKg0QIhK0zAG\nAgbDJwaECA0Qoj1rHAMBOSoNECI0QIj2rGFVZvRsAHxiQIhK0zhu4ZTjEwNChAYI0Z41rCRugD4A\nKg0QotI0zQwEDIBPDAgRGiBEe9aw3vU0DASkqDRAiNAAIdqzxnFb2hyfGBCi0jSMP7UxGCoNECI0\nQIj2rHFH+L0Z4xMDQlSahlVJhxkIiFFpgBChAUK0Z43jOE2OSgOECA0Qoj1rWO80Gn5vpvjEgBCV\npnH8qY0clQYIERogRHvWMG6sMRgqDRAiNECI9qxpHKcZBJ8YEKLSNI4/tZGj0gAhQgOEaM8axuXO\ng6HSYOzZvsD2g7b32b5ymuVvs/2o7Z3d4x19yzba3ts9No5if6g0jRv3IWfbSyRdJ+k8SZOS7rG9\ntap2T1n15qq6fMprT5H0QUkT6p0AcW/32ieH2afx/sQAab2kfVW1v6qelXSTpA3zfO35km6tqie6\noNwq6YJhd4jQYByssL2j73FZ37JVkh7um57s5k31H23fZ3uL7TXhayO0Zw0boxugP1ZVEzMsm24H\na8r0/5L06ap6xvZ/lrRZ0tnzfG2MSoNxNylpTd/0akkH+leoqser6plu8n9K+rfzfe0gCA3G3T2S\n1tlea3uZpIslbe1fwfbKvskLJe3pnm+X9Ebby20vl/TGbt5QaM8aN+6n0VTVIduXq/c/+xJJN1bV\nLttXS9pRVVslvdv2hZIOSXpC0tu61z5h+w/VC54kXV1VTwy7T4QGY6+qtknaNmXeB/qeXyXpqhle\ne6OkG0e5P4SmYVy5ORi+0wAhQgOEaM8aN+6n0YwjPjEgRKVpWY3NGQGLCpUGCBEaIER71rDS+J8R\nMI6oNECI0AAh2rPGMXqWo9IAISpNwzhhczBUGiBEaIAQ7VnjaM9yVBogRGiAEO1Zw8bovmeLCpUG\nCFFpGscJmzkqDRAiNECI9qxlxXGaQVBpgBCVpmGcsDkYKg0QIjRAiPascbRnOSoNECI0QIj2rGGc\nsDkYKg0QotI0rqg0MSoNECI0QIj2rHFcT5Oj0gAhKk3DiksDBkKlAUKEBgjRnjWO4zQ5Kg0QIjRA\niPasaZywOQgqDRCi0jSOgYAclQYIERogRHvWMO57NhgqDRAiNECI9qxl1TvTGRkqDRCi0jSOKzdz\nVBogRGiAEO1Zw0qcRjMIKg0QotI0jUsDBkGlAUKEBgjRnjWOMwJyVBogRGiAEO1Z4zhOk6PSACEq\nTcOqqDSDoNIAIUIDhGjPGsdpNDkqDRCi0jSOMwJy8640tpfY/ortv+qm19q+2/Ze2zfbXnbsdhMY\nH0l79h5Je/qmPyzp2qpaJ+lJSZeOcseAo2xfYPtB2/tsXznN8vfZ3m37Ptu3235537LDtnd2j62j\n2J95hcb2akm/Iun6btqSzpa0pVtls6SLRrFDOL6qvOCP2dheIuk6SW+SdIakS2yfMWW1r0iaqKqf\nU+//yf/Wt+x7VXVm97hwFJ/ZfCvNRyT9vqQj3fSpkp6qqkPd9KSkVdO90PZltnfY3vHo44eH2lk0\nab2kfVW1v6qelXSTpA39K1TVnVX1dDd5l6TVx3KH5gyN7V+V9EhV3ds/e5pVp/1KWVWbqmqiqiZO\nO3XJgLuJ57gVR3+xdo/L+patkvRw3/SMv6A7l0r6m77pk7pt3mV7JN3QfEbPXi/pQttvlnSSpBeq\nV3lOtr20qzarJR0YxQ7h+CnN3R4dJ49V1cQMy+b9C9r2b0iakPTv+ma/rKoO2H6FpDts319VXxtm\nZ+esNFV1VVWtrqrTJV0s6Y6q+k+S7pT0lm61jZJuGWZHgBlMSlrTNz3tL2jb50p6v6QLq+qZo/Or\n6kD3c7+kL0g6a9gdGubg5hWS3md7n3rfcW4Ydmdw/NUYPOZwj6R13SGOZer94v6RUTDbZ0n6mHqB\neaRv/nLbJ3bPV6jXNe2e94czg+jgZlV9Qb20Hk3u+mF3AJhNVR2yfbmk7ZKWSLqxqnbZvlrSjqra\nKum/S3qBpL/sDezqoW6k7FWSPmb7iHoF4pqqOr6hARZCVW2TtG3KvA/0PT93htd9UdKrR70/hKZl\nXE8zEE7YBEKEBgjRnrWOs5xjVBogRKVpHAMBOSoNECI0QIj2rHFc7pyj0gAhKk3D+Jubg6HSACFC\n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\naVpWxUDAAKg0QIjQACHas8YxEJCj0mBRs/1W27tsH7E9Mct6F9h+0PY+21f2zV9r+27be23fbHvZ\nXO9JaLDYPSDpP0j6+5lWsL1E0nWS3iTpDEmX2D6jW/xhSddW1TpJT0q6dK43JDStqyML/xhm96v2\nVNWDc6y2XtK+qtpfVc9KukkSpz3KAAACoklEQVTSBtuWdLakLd16myVdNNd7Ehq0YJWkh/umJ7t5\np0p6qqoOTZk/KwYCGvZdPbn9ttqyYqH3Q9JJtnf0TW+qqk1HJ2zfJukl07zu/VV1yzy272nm1Szz\nZ0VoGlZVFyz0PsxHVZ075CYmJa3pm14t6YCkxySdbHtpV22Ozp8V7RlacI+kdd1I2TJJF0vaWlUl\n6U5Jb+nW2yhpzspFaLCo2f73ticlvU7SX9ve3s1/qe1tktRVkcslbZe0R9JnqmpXt4krJL3P9j71\nvuPcMNd70p5hUauqz0v6/DTzD0h6c9/0Nknbpllvv3qja/NGpQFChAYIERogRGiAEKEBQoQGCBEa\nIERogBChAUKEBggRGiBEaIAQoQFChAYIERogRGiAEKEBQoQGCBEaIERogBChAUKEBggRGiBEaIAQ\noQFChAYIERogRGiAEKEBQoQGCBEaIERogBChAUKEBggRGiBEaIAQoQFChAYIERogRGiAEKEBQoQG\nCBEaIERogBChAUKEBggRGiBEaIAQoQFChAYIERogRGiAEKEBQoQGCBEaIERogBChAUKEBggRGiBE\naIAQoQFChAYIERogRGiAEKEBQoQGCBEaIERogBChAUKEBggRGiBEaIAQoQFChAYIERogRGiAEKEB\nQoQGCBEaIERogBChAUKEBggRGiBEaIAQoQFChAYIERogRGiAEKEBQoQGCBEaIERogBChAUKEBggR\nGiBEaIAQoQFChAYIERogRGiAEKEBQoQGCBEaIERogBChAUKEBgi5qo7fm9mPSvp/fbNWSHpsBJtm\nOz/08qo6bQTvjRkc19D82JvbO6pqgu0c2+1gtGjPgBChAUILHZpNbOe4bAcjtKDfaYDFaKErDbDo\nEBogRGiAEKEBQoQGCP1/bShupa8IeuMAAAAASUVORK5CYII=\n",
+      "text/plain": [
+       "<matplotlib.figure.Figure at 0x10e8dea90>"
+      ]
+     },
+     "metadata": {},
+     "output_type": "display_data"
+    }
+   ],
+   "source": [
+    "import matplotlib.pyplot as plt\n",
+    "plt.matshow(S)\n",
+    "plt.colorbar()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "As we can see, because we set the external magnetic field to $h = 0.2$, after a while all spins became $S_i = +1$ to align with $h$.\n",
+    "\n",
+    "We can also set $h = 0$ to simulate the 1D Ising chain, in which case there will always be up spins $S_i = +1$ and down spins $S_i = -1$.\n",
+    "\n",
+    "In fact, we will find what Ising discovered: whatever the inverse temperature $\\beta$, the Ising spins do not spontaneously align to become all up or all down.\n",
+    "\n",
+    "Technically, this means that the 1D Ising model has no phase transitions at $T > 0$. It does, however, have a phase transition at $T = 0$."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## 2D Ising Simulation\n",
+    "\n",
+    "Simulating an Ising model in two dimensions involves the same steps as the 1D simulation, except that the spins have to be organized into a matrix $S(i,j)$, and therefore to pick a random spin, we need a random $i$ and a random $j$.\n",
+    "\n",
+    "If we run such a simulation for different temperature $T$, we will find that below some $T_C > 0$, the Ising spins spontaneously align into all up or all down.\n",
+    "\n",
+    "It is interesting to watch this phase transition as it happens, and there is an <tt>animation</tt> package in <tt>matplotlib</tt> that we can use. However, I will leave it to you to explore this animation on your own, while I deal with all the things that need to be done because of COVID-19."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "collapsed": true
+   },
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.4"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}
