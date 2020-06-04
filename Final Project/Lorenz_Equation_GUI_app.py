@@ -1,9 +1,8 @@
 """
 Author: James Morillo
-Matric: U1740375H
 SPMS
 PH4419-COMPUTATIONAL PHYSICS Final Project 
-Project title: "Lorenz Equations"
+Project title: "Lorenz Equations App"
 """
 
 #Initialise Imports
